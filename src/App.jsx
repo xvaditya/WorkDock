@@ -9,6 +9,8 @@ import { OrdersPage } from "./pages/OrdersPage";
 import { StaffPage } from "./pages/StaffPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { LoginPage } from "./pages/LoginPage";
+import { RevenueLeaksPage } from "./pages/RevenueLeaksPage";
+import { SmartFollowUpPage } from "./pages/SmartFollowUpPage";
 
 export default function WorkDock() {
   const [authed, setAuthed] = useState(false);
@@ -58,6 +60,8 @@ export default function WorkDock() {
           {page === "orders" && <OrdersPage orders={orders} setOrders={setOrders} staff={staff}/>}
           {page === "staff" && <StaffPage staff={staff} setStaff={setStaff}/>}
           {page === "analytics" && <AnalyticsPage orders={orders}/>}
+          {page === "revenue-leaks" && <RevenueLeaksPage/>}
+          {page === "smart-followup" && <SmartFollowUpPage/>}
         </main>
       </div>
     </div>

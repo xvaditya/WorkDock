@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { REVENUE_DATA, CATEGORY_DATA } from "../data/mockData";
 import { fmtCurrency, isLowStock } from "../utils/helpers";
 import { MetricCard } from "../components/ui/MetricCard";
@@ -6,17 +7,69 @@ import { AlertBanner } from "../components/ui/AlertBanner";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { BarChart } from "../components/charts/BarChart";
 import { DonutChart } from "../components/charts/DonutChart";
+import { dashboardAPI, leakDetectionAPI } from "../utils/api";
 
 export function DashboardPage({ inventory, orders, staff, alerts }) {
+  const [backendData, setBackendData] = useState(null);
+  const [leakSummary, setLeakSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const todayRev = REVENUE_DATA[REVENUE_DATA.length - 1].revenue;
   const monthRev = REVENUE_DATA.reduce((s, d) => s + d.revenue, 0);
   const pendingOrders = orders.filter(o => o.status === "pending").length;
   const allTasks = staff.flatMap(s => s.tasks);
   const pendingTasks = allTasks.filter(t => !t.done).length;
 
+  useEffect(() => {
+    const loadBackendData = async () => {
+      try {
+        const [dashRes, leaksRes] = await Promise.all([
+          dashboardAPI.getSummary(),
+          leakDetectionAPI.getTotalLoss(),
+        ]);
+        setBackendData(dashRes.data);
+        setLeakSummary(leaksRes.data);
+      } catch (error) {
+        console.log("Backend not connected yet");
+      }
+      setLoading(false);
+    };
+    loadBackendData();
+  }, []);
+
   return (
     <div>
       <AlertBanner alerts={alerts}/>
+
+      {/* Backend Data Section */}
+      {backendData && (
+        <div style={{ marginBottom: 24, padding: 16, background: "linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(168,85,247,0.1) 100%)", borderRadius: 12, border: "1px solid rgba(99,102,241,0.2)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <h3 style={{ fontFamily: "'Exo 2', monospace", fontWeight: 700, fontSize: 14, color: "#a78bfa", letterSpacing: 0.5 }}>
+              🚀 REAL-TIME BACKEND DATA
+            </h3>
+            <span style={{ fontSize: 10, color: "#6b7280", fontFamily: "monospace" }}>CONNECTED ✓</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+            <div style={{ padding: 12, background: "rgba(255,255,255,0.02)", borderRadius: 8, border: "1px solid rgba(107,70,193,0.15)" }}>
+              <div style={{ fontSize: 10, color: "#9ca3af", fontFamily: "monospace", marginBottom: 4 }}>Total Revenue</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#86efac", fontFamily: "monospace" }}>{fmtCurrency(backendData.totalRevenue || 0)}</div>
+            </div>
+            <div style={{ padding: 12, background: "rgba(255,255,255,0.02)", borderRadius: 8, border: "1px solid rgba(107,70,193,0.15)" }}>
+              <div style={{ fontSize: 10, color: "#9ca3af", fontFamily: "monospace", marginBottom: 4 }}>Products</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#60a5fa", fontFamily: "monospace" }}>{backendData.totalProducts || 0}</div>
+            </div>
+            <div style={{ padding: 12, background: "rgba(255,255,255,0.02)", borderRadius: 8, border: "1px solid rgba(107,70,193,0.15)" }}>
+              <div style={{ fontSize: 10, color: "#9ca3af", fontFamily: "monospace", marginBottom: 4 }}>Low Stock</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#fca5a5", fontFamily: "monospace" }}>{backendData.lowStockCount || 0}</div>
+            </div>
+            <div style={{ padding: 12, background: "rgba(255,255,255,0.02)", borderRadius: 8, border: "1px solid rgba(107,70,193,0.15)" }}>
+              <div style={{ fontSize: 10, color: "#9ca3af", fontFamily: "monospace", marginBottom: 4 }}>Revenue Loss</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#f87171", fontFamily: "monospace" }}>{fmtCurrency(leakSummary || 0)}</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero metrics */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>

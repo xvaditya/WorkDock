@@ -4,6 +4,8 @@ export const NAV = [
   { id: "orders", label: "ORDERS", icon: "◈" },
   { id: "staff", label: "STAFF", icon: "◎" },
   { id: "analytics", label: "ANALYTICS", icon: "◌" },
+  { id: "revenue-leaks", label: "REVENUE LEAKS 🔥", icon: "⚠" },
+  { id: "smart-followup", label: "SMART FOLLOWUP 💡", icon: "📞" },
 ];
 
 export const STATUS_CONFIG = {

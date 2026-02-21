@@ -6,7 +6,7 @@ import { StatusBadge } from "../components/ui/StatusBadge";
 import { BarChart } from "../components/charts/BarChart";
 import { DonutChart } from "../components/charts/DonutChart";
 
-export function AnalyticsPage({ orders }) {
+export  function AnalyticsPage({ orders }) {
   const completed = orders.filter(o => o.status === "completed");
   const totalRev = REVENUE_DATA.reduce((s, d) => s + d.revenue, 0);
   const avgOrder = totalRev / orders.length;
