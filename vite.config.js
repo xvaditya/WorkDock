@@ -3,9 +3,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: "/WorkDock/",
-  server: {
-    port: 3000,
-    open: true,
-  },
+  base: "/WorkDock/"
 })
